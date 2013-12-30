@@ -1,1 +1,1 @@
-package "totalterminal"
+sprout_osx_apps_homebrew_cask "totalterminal"
