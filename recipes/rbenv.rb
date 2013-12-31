@@ -16,6 +16,13 @@ execute "/usr/local/bin/rbenv global #{rbenv_config["global"]}" do
   not_if "/usr/local/bin/rbenv global | grep #{rbenv_config["global"]}"
 end
 
+%w(/etc/profile /etc/zshenv).each do |profile|
+  execute "add rbenv setting to #{profile}" do
+    command %{ test -e #{profile} && echo 'eval "$(/usr/local/bin/rbenv init -)"' >> #{profile} }
+    not_if "grep 'rbenv init' #{profile}"
+  end
+end
+
 rbenv_config["gems"].each do |version, gem_hashs|
   gem_hashs.each do |h|
     pkg = h["name"]
@@ -26,12 +33,5 @@ rbenv_config["gems"].each do |version, gem_hashs|
 
       not_if "RBENV_VERSION=#{version} gem list | grep '^#{pkg} ' "
     end
-  end
-end
-
-%w(/etc/profile /etc/zshenv).each do |profile|
-  execute "add rbenv setting to #{profile}" do
-    command %{ test -e #{profile} && echo 'eval "$(/usr/local/bin/rbenv init -)"' >> #{profile} }
-    not_if "grep 'rbenv init' #{profile}"
   end
 end
