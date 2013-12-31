@@ -26,10 +26,12 @@ end
 rbenv_config["gems"].each do |version, gem_hashs|
   gem_hashs.each do |h|
     pkg = h["name"]
+    gem_command = `RBENV_VERSION=#{version} /usr/local/bin/rbenv which gem`
+
     execute "gem-install-#{pkg}-in-#{version}" do
       user node["current_user"]
       environment ({'HOME' => "/Users/#{node["current_user"]}", 'RBENV_VERSION' => version})
-      command "gem install #{pkg}"
+      command "#{gem_command} install #{pkg}"
 
       not_if "RBENV_VERSION=#{version} gem list | grep '^#{pkg} ' "
     end
